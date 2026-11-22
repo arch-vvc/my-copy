@@ -27,6 +27,44 @@ st.set_page_config(
     initial_sidebar_state = "collapsed",
 )
 
+# ── Inline images ──────────────────────────────────────────────────────────
+# Streamlit normally serves st.image / st.pyplot through its own /media/ route. On
+# Streamlit Community Cloud that route answers 500, so the pictures never load.
+# Embedding them in the page as data URIs avoids the route entirely.
+import base64 as _b64, html as _html, io as _io
+
+def _inline_png(data, caption=None):
+    tag = ('<img alt="" style="width:100%;height:auto;display:block" '
+           'src="data:image/png;base64,' + _b64.b64encode(data).decode() + '">')
+    if caption:
+        tag += ('<div style="font-size:0.85rem;opacity:0.7;margin-top:0.25rem">'
+                + _html.escape(str(caption)) + "</div>")
+    st.markdown(tag, unsafe_allow_html=True)
+
+_st_image_orig, _st_pyplot_orig = st.image, st.pyplot
+
+def _safe_image(image, caption=None, *args, **kwargs):
+    if isinstance(image, (str, os.PathLike)) and str(image).lower().endswith(".png"):
+        try:
+            with open(image, "rb") as _fh:
+                _inline_png(_fh.read(), caption)
+            return
+        except Exception:
+            pass
+    return _st_image_orig(image, caption, *args, **kwargs)
+
+def _safe_pyplot(fig=None, *args, **kwargs):
+    try:
+        _f = fig if fig is not None else plt.gcf()
+        _buf = _io.BytesIO()
+        _f.savefig(_buf, format="png", dpi=150, bbox_inches="tight", facecolor=_f.get_facecolor())
+        _inline_png(_buf.getvalue())
+        return
+    except Exception:
+        return _st_pyplot_orig(fig, *args, **kwargs)
+
+st.image, st.pyplot = _safe_image, _safe_pyplot
+
 BASE   = os.path.dirname(os.path.abspath(__file__))
 # Hosted runs (Streamlit Cloud) do not `pip install -e .`, so make src/ importable here.
 _SRC = os.path.join(BASE, "src")
