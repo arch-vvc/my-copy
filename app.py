@@ -304,7 +304,7 @@ with tab_ir:
             "roles":  ", ".join(m["summary"]["roles"]),
         } for n, m in manifests.items()]
         st.markdown("**IR contents**")
-        st.dataframe(pd.DataFrame(size_rows), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(size_rows), width="stretch", hide_index=True)
 
         # Capability matrix: capabilities × datasets
         st.markdown("**Capability matrix**  (yes = supported by the dataset's own fields)")
@@ -399,7 +399,7 @@ with tab_ir:
                         "headline": (_headline(stage, out) if out["status"] == "ran"
                                      else "needs " + ", ".join(out.get("missing", []))),
                     })
-            st.dataframe(pd.DataFrame(res_rows), use_container_width=True, hide_index=True)
+            st.dataframe(pd.DataFrame(res_rows), width="stretch", hide_index=True)
 
             # Topology stages get the spotlight: they are what the 3-tier SCMS
             # adapter unlocked, and the PPO-vs-baselines table is the payoff.
@@ -437,7 +437,7 @@ with tab_ir:
                              "total reward": tot.get("random"),
                              "route risk": avg.get("random"),
                              "unserved": uns.get("random")},
-                        ]), use_container_width=True, hide_index=True)
+                        ]), width="stretch", hide_index=True)
                         st.caption(
                             f"beats greedy in {ppo.get('ppo_beats_greedy_pct', 0):.0f}% "
                             f"of {ppo['n_test']} episodes (greedy wins "
@@ -570,7 +570,7 @@ with tab_overview:
                             "Direction":       ["↑ Longer recovery" if v > 0 else "↓ Faster recovery"
                                                for v in _ov_signed],
                         }).sort_values("Avg SHAP (days)", ascending=False)
-                        st.dataframe(_dir_df, use_container_width=True, hide_index=True, height=280)
+                        st.dataframe(_dir_df, width="stretch", hide_index=True, height=280)
                         st.caption("Values in days. ↑ means this feature tends to increase recovery time on average.")
                     except Exception:
                         st.info("Install shap for the direction table: pip install shap")
@@ -704,7 +704,7 @@ with tab_anomaly:
                     fig_c.update_layout(paper_bgcolor=PAPER, plot_bgcolor=PAPER,
                                         coloraxis_showscale=False, height=240,
                                         margin=dict(l=10, r=10, t=10, b=30))
-                    st.plotly_chart(fig_c, use_container_width=True)
+                    st.plotly_chart(fig_c, width="stretch")
                 with cw2:
                     st.markdown(
                         f"**Intercept** `{cal.get('intercept', float('nan')):.2f}`  \n"
@@ -725,7 +725,7 @@ with tab_anomaly:
             template="report",
         )
         fig.update_layout(paper_bgcolor=PAPER, plot_bgcolor=PAPER, height=260)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
         st.markdown("#### Top High-Confidence Anomalies")
         cols_show = [c for c in ["manufacturer", "distributor", "retailer", "quantity", "anomaly_score"]
@@ -733,7 +733,7 @@ with tab_anomaly:
         st.dataframe(
             high[cols_show].sort_values("anomaly_score", ascending=False).head(50)
                            .reset_index(drop=True),
-            use_container_width=True, height=320,
+            width="stretch", height=320,
         )
 
         if "date" in anom.columns:
@@ -748,7 +748,7 @@ with tab_anomaly:
                 template="report", color_discrete_sequence=[RED],
             )
             fig2.update_layout(paper_bgcolor=PAPER, plot_bgcolor=PAPER, height=260)
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2, width="stretch")
 
 # ══════════════════════════════════════════════════════════════════════════
 # TAB 4, RISK ANALYSIS
@@ -792,7 +792,7 @@ with tab_risk:
                 yaxis=dict(autorange="reversed"),
                 coloraxis_showscale=False, height=480,
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
 
         with col_right:
             if not gnn.empty:
@@ -809,7 +809,7 @@ with tab_risk:
                     yaxis=dict(autorange="reversed"),
                     coloraxis_showscale=False, height=480,
                 )
-                st.plotly_chart(fig2, use_container_width=True)
+                st.plotly_chart(fig2, width="stretch")
             else:
                 st.info("Run Stage 7 (GNN Encoder) to see enhanced risk scores.")
 
@@ -817,7 +817,7 @@ with tab_risk:
             st.markdown("#### GNN Embedding Space")
             fig_path = os.path.join(FIGS, "fig5_gnn_embeddings.png")
             if os.path.exists(fig_path):
-                st.image(fig_path, use_container_width=True)
+                st.image(fig_path, width="stretch")
 
         # ── GNN score: does it detect anything? (node-level injection benchmark) ──
         _gb = load_json("gnn_injection_eval.json")
@@ -918,14 +918,14 @@ with tab_risk:
                                             height=max(240, 34 * len(_xd) + 80),
                                             margin=dict(l=10, r=20, t=30, b=40),
                                             legend=dict(orientation="h", y=1.12, x=0))
-                        st.plotly_chart(fig_x, use_container_width=True)
+                        st.plotly_chart(fig_x, width="stretch")
                     with xg2:
                         st.dataframe(
                             _xd[["neighbour", "type", "gnn_risk", "similarity", "influence"]]
                               .rename(columns={"neighbour": "Neighbour", "type": "Type",
                                                "gnn_risk": "GNN risk", "similarity": "Cos. sim.",
                                                "influence": "Influence"}),
-                            use_container_width=True, hide_index=True,
+                            width="stretch", hide_index=True,
                             height=max(240, 36 * len(_xd) + 40))
                         _top = _xr["top_drivers"][0]
                         st.markdown(
@@ -944,7 +944,7 @@ with tab_risk:
         col_ppo1, col_ppo2 = st.columns([1.4, 1])
         with col_ppo1:
             if os.path.exists(ppo_fig):
-                st.image(ppo_fig, use_container_width=True,
+                st.image(ppo_fig, width="stretch",
                          caption="PPO agent cumulative reward over training episodes")
             else:
                 st.info("Run Stage 11 (PPO Routing Agent) to generate the training figure.")
@@ -973,7 +973,7 @@ with tab_risk:
                 mem_df = pd.read_csv(mem_csv)
                 if not mem_df.empty:
                     st.markdown("**Top retrieved matches (sample)**")
-                    st.dataframe(mem_df.head(10), use_container_width=True)
+                    st.dataframe(mem_df.head(10), width="stretch")
             except Exception:
                 pass
         if not os.path.exists(mem_txt) and not os.path.exists(mem_csv):
@@ -1039,7 +1039,7 @@ with tab_risk:
                     height=300, margin=dict(l=40, r=20, t=30, b=40),
                     xaxis_title="Week", yaxis_title="Composite stress",
                 )
-                st.plotly_chart(fig_ms, use_container_width=True)
+                st.plotly_chart(fig_ms, width="stretch")
         with vc2:
             fig_dv = px.bar(
                 mv.sort_values("delta"), x="delta", y="event", orientation="h",
@@ -1051,7 +1051,7 @@ with tab_risk:
             fig_dv.update_layout(paper_bgcolor=PAPER, plot_bgcolor=PAPER,
                                  height=300, margin=dict(l=10, r=40, t=30, b=40),
                                  legend=dict(orientation="h", y=1.15, x=0))
-            st.plotly_chart(fig_dv, use_container_width=True)
+            st.plotly_chart(fig_dv, width="stretch")
 
         st.dataframe(
             mv[["event", "start", "pre_mean", "window_peak", "delta", "placebo_percentile",
@@ -1059,7 +1059,7 @@ with tab_risk:
                 "event": "Crisis", "start": "Onset", "pre_mean": "Pre (12 wk)",
                 "window_peak": "Peak (8 wk)", "delta": "Δ", "placebo_percentile": "Placebo %ile",
                 "verdict": "Verdict", "top_driver": "Top Driver", "driver_delta": "Driver Δ"}),
-            use_container_width=True, height=230, hide_index=True)
+            width="stretch", height=230, hide_index=True)
         _sens_p = os.path.join(OUT, "macro_burn_in_sensitivity.csv")
         if os.path.exists(_sens_p):
             st.markdown("**Burn-in sensitivity**, the same event study with the stress table "
@@ -1070,13 +1070,13 @@ with tab_risk:
             _show = _sd[["burn_in_weeks", "series_start", "n_placebo"] + _vcols].rename(
                 columns={"burn_in_weeks": "Burn-in (wk)", "series_start": "Series from", "n_placebo": "Placebo windows",
                          **{c: c.split("::")[0] for c in _vcols}})
-            st.dataframe(_show, use_container_width=True, hide_index=True, height=36 * len(_show) + 40)
+            st.dataframe(_show, width="stretch", hide_index=True, height=36 * len(_show) + 40)
         with st.expander("Full Stage 27 report + figure"):
             if os.path.exists(_mv_rpt):
                 st.code(open(_mv_rpt).read(), language=None)
             _f11 = os.path.join(FIGS, "fig11_macro_event_validation.png")
             if os.path.exists(_f11):
-                st.image(_f11, use_container_width=True)
+                st.image(_f11, width="stretch")
 
 # ══════════════════════════════════════════════════════════════════════════
 # (Macro Stress & LSTM tab removed 2026-07-16, LSTM did not beat naive
@@ -1163,7 +1163,7 @@ with tab_recovery:
                     "Buffer $": (f"${e['buffer']['buffer_usd']:,}"
                                  if e.get("buffer") else ""),
                 })
-            st.dataframe(pd.DataFrame(_rows), use_container_width=True, height=300)
+            st.dataframe(pd.DataFrame(_rows), width="stretch", height=300)
         else:
             sm = s["summary"]
             st.markdown(f"**Counterfactual:** what if **{s['vendor']}** went offline?")
@@ -1189,7 +1189,7 @@ with tab_recovery:
                 "Buffer $": (f"${e['buffer']['buffer_usd']:,}"
                              if e.get("buffer") else ""),
             } for e in s["lanes"]]
-            st.dataframe(pd.DataFrame(_rows), use_container_width=True, height=300)
+            st.dataframe(pd.DataFrame(_rows), width="stretch", height=300)
 
         _eh_rpt = os.path.join(OUT, "event_harness_report.txt")
         if os.path.exists(_eh_rpt):
@@ -1277,7 +1277,7 @@ with tab_recovery:
                 "alternate_vendor": "In-Country Alternate",
                 "volume_coverage": "Volume Coverage",
             }).reset_index(drop=True),
-            use_container_width=True, height=300
+            width="stretch", height=300
         )
 
         _scms_rpt = os.path.join(OUT, "scms_spine_report.txt")
@@ -1340,7 +1340,7 @@ with tab_recovery:
                 "buffer_value_usd_95": "Buffer ($)",
                 "holding_cost_usd_per_yr": "Holding ($/yr)",
                 "lead_source": "Lead-Time Source"}).reset_index(drop=True),
-            use_container_width=True, height=260)
+            width="stretch", height=260)
         _ss_rpt = os.path.join(OUT, "scms_safety_stock_report.txt")
         if os.path.exists(_ss_rpt):
             with st.expander("Full sizing report (incl. lanes not sizeable + caveats)"):
@@ -1394,7 +1394,7 @@ with tab_recovery:
                 "buffer_now_usd": "Buffer Now ($)",
                 "r1_buffer_whatif_usd": "Buffer What-If ($)",
                 "r1_buffer_delta_usd": "Released ($)"}).reset_index(drop=True),
-            use_container_width=True, height=260)
+            width="stretch", height=260)
         _vs_rpt = os.path.join(OUT, "scms_vendor_scorecard_report.txt")
         if os.path.exists(_vs_rpt):
             with st.expander("Full scorecard report + honest caveats"):
@@ -1439,7 +1439,7 @@ with tab_recovery:
                         "t0": "First Late", "pool_size": "Pool",
                         "entrants": "Vendor(s) Reality Chose",
                         "top3_ours": "Planner Top-3", "hit3_ours": "Hit@3"}),
-                use_container_width=True, height=260)
+                width="stretch", height=260)
 
     # ── SCMS Validation 2, Real-Event Replay (Haiti 2010) ─────────────────
     st.markdown("#### Validation 2: Real-Event Replay: Haiti Earthquake, Jan 2010")
@@ -1522,12 +1522,12 @@ with tab_recovery:
                 "failure_mode": "Failure Mode (our vocabulary)",
                 "ex_ante": "Ex-Ante", "match": "Match",
                 "in_data": "In-Data Evidence (Stage 21)"}),
-            use_container_width=True, height=300)
+            width="stretch", height=300)
         with st.expander("Full case narratives, rationales + sources"):
             _ct_rpt = os.path.join(OUT, "case_table_report.txt")
             if os.path.exists(_ct_rpt):
                 st.code(open(_ct_rpt).read(), language=None)
-            st.dataframe(ct, use_container_width=True, height=300)
+            st.dataframe(ct, width="stretch", height=300)
 
     # ── SCMS Validation 4, Outcome Counterfactual (Stage 28) ──────────────
     st.markdown("#### Validation 4: Outcome Counterfactual: planner's pick vs procurement's real choice")
@@ -1593,7 +1593,7 @@ with tab_recovery:
                                  plot_bgcolor=PAPER, height=280, showlegend=False,
                                  yaxis_title="Late rate, year after t0 (%)",
                                  margin=dict(l=40, r=20, t=30, b=40))
-            st.plotly_chart(fig_cf, use_container_width=True)
+            st.plotly_chart(fig_cf, width="stretch")
         with g2:
             fig_sv = px.histogram(
                 cf, x="lateness_saved_days", nbins=25, template="report",
@@ -1603,7 +1603,7 @@ with tab_recovery:
             fig_sv.add_vline(x=0, line=dict(color=RED, dash="dash"))
             fig_sv.update_layout(paper_bgcolor=PAPER, plot_bgcolor=PAPER, height=280,
                                  yaxis_title="Lanes", margin=dict(l=40, r=20, t=30, b=40))
-            st.plotly_chart(fig_sv, use_container_width=True)
+            st.plotly_chart(fig_sv, width="stretch")
         if _cfs.get("strata"):
             st.markdown("**Sensitivity, does the gap survive within strata?**")
             st.caption(
@@ -1623,7 +1623,7 @@ with tab_recovery:
                         "Saved d/ship": f"{s['lateness_saved']:+.1f}",
                         "Holds?": "yes" if s["a_late_rate"] > s["b_late_rate"] else "REVERSES",
                     })
-            st.dataframe(pd.DataFrame(_srows), use_container_width=True, hide_index=True,
+            st.dataframe(pd.DataFrame(_srows), width="stretch", hide_index=True,
                          height=36 * len(_srows) + 40)
         with st.expander("Per-lane outcomes + full protocol report"):
             _cf_rpt = os.path.join(OUT, "scms_counterfactual_report.txt")
@@ -1636,10 +1636,10 @@ with tab_recovery:
                     "actual_vendor": "Actual Vendor (A)", "recommended_vendor": "Planner Pick (B)",
                     "a_n": "A ships", "a_late_rate": "A late", "b_n": "B ships",
                     "b_late_rate": "B late", "lateness_saved_days": "Days saved/ship"}),
-                use_container_width=True, height=300, hide_index=True)
+                width="stretch", height=300, hide_index=True)
             _f12 = os.path.join(FIGS, "fig12_scms_counterfactual.png")
             if os.path.exists(_f12):
-                st.image(_f12, use_container_width=True)
+                st.image(_f12, width="stretch")
 
     # ── Network-Grounded Response Plan (Stage 18) ──────────────────────────
     st.divider()
@@ -1757,7 +1757,7 @@ with tab_recovery:
                     "activation_days": "Activation (days)",
                     "est_recovery_days": "Recovery Prior, context only (days)",
                 }).reset_index(drop=True),
-                use_container_width=True, height=280
+                width="stretch", height=280
             )
 
         if len(exposed_df):
@@ -1880,7 +1880,7 @@ with tab_recovery:
                 if not sel_backup:
                     st.caption("'Alternative Supplier' is excluded, not available without a backup supplier.")
                 _show_df = rank_df[["Strategy", "Predicted Recovery (days)"]].copy()
-                st.dataframe(_show_df, use_container_width=True, hide_index=True)
+                st.dataframe(_show_df, width="stretch", hide_index=True)
 
             severity_labels = {1: "Minimal", 2: "Low", 3: "Moderate", 4: "High", 5: "Critical"}
             st.info(
@@ -1959,7 +1959,7 @@ with tab_recovery:
                     top_backups["Backup Score"]  = top_backups["Backup Score"].round(3)
                     top_backups["Backup Risk"]   = top_backups["Backup Risk"].round(3)
                     top_backups["Supply Volume"] = top_backups["Supply Volume"].apply(lambda x: f"{int(x):,}")
-                    st.dataframe(top_backups, use_container_width=True, hide_index=True)
+                    st.dataframe(top_backups, width="stretch", hide_index=True)
 
             # ── Why did the model predict this? (per-prediction SHAP) ─────
             st.markdown("#### Why did the model predict this?")
@@ -2054,7 +2054,7 @@ with tab_recovery:
 
         fig_path = os.path.join(FIGS, "fig6_recovery.png")
         if os.path.exists(fig_path):
-            st.image(fig_path, use_container_width=True)
+            st.image(fig_path, width="stretch")
 
         # ── Inventory Agent ───────────────────────────────────────────
         st.divider()
@@ -2091,7 +2091,7 @@ with tab_recovery:
                     st.markdown("**Top-1 transfer recommendation per at-risk retailer**")
                     st.dataframe(
                         top1.style.background_gradient(subset=["Transfer Score"], cmap="Greens"),
-                        use_container_width=True
+                        width="stretch"
                     )
 
                     # Summary metrics
@@ -2134,9 +2134,9 @@ with tab_multi:
 
         if "Industry" not in df_f1.columns or "F1_Score" not in df_f1.columns:
             st.warning("multi_domain_f1.csv is missing required columns: Industry, F1_Score")
-            st.dataframe(df_f1, use_container_width=True)
+            st.dataframe(df_f1, width="stretch")
             if os.path.exists(fig_path):
-                st.image(fig_path, use_container_width=True)
+                st.image(fig_path, width="stretch")
         else:
             best_pool   = df_f1[df_f1["Industry"].astype(str).str.lower() != "all domains"]
             best_row    = best_pool.sort_values("F1_Score", ascending=False).iloc[0] if not best_pool.empty else None
@@ -2149,10 +2149,10 @@ with tab_multi:
             col3.metric("Overall F1",     f"{float(overall_f1):.3f}"
                                           if overall_f1 != "N/A" else "N/A")
 
-            st.dataframe(df_f1, use_container_width=True)
+            st.dataframe(df_f1, width="stretch")
 
             if os.path.exists(fig_path):
-                st.image(fig_path, use_container_width=True)
+                st.image(fig_path, width="stretch")
 
 # ══════════════════════════════════════════════════════════════════════════
 # TAB 8, IMMUNOLOGICAL MEMORY (FAISS)
@@ -2226,7 +2226,7 @@ with tab_memory:
             dtype_counts.columns = ["Disruption Type", "Count"]
             col1, col2 = st.columns(2)
             with col1:
-                st.dataframe(dtype_counts, use_container_width=True, hide_index=True)
+                st.dataframe(dtype_counts, width="stretch", hide_index=True)
             with col2:
                 if "match_recovery_days" in df_mem.columns:
                     avg_rec = (df_mem.groupby("match_disruption_type")["match_recovery_days"]
@@ -2236,7 +2236,7 @@ with tab_memory:
                     avg_rec["Avg Recovery Days"] = avg_rec["Avg Recovery Days"].round(1)
                     avg_rec = avg_rec.sort_values("Avg Recovery Days", ascending=False)
                     st.markdown("**Average Recovery Days by Disruption Type**")
-                    st.dataframe(avg_rec, use_container_width=True, hide_index=True)
+                    st.dataframe(avg_rec, width="stretch", hide_index=True)
 
         st.divider()
 
@@ -2278,7 +2278,7 @@ with tab_memory:
             "match_rank", "match_distance", "match_recovery_days",
             "match_response_type", "match_disruption_type"
         ] if c in df_mem.columns]
-        st.dataframe(df_mem[cols_to_show].head(30), use_container_width=True, hide_index=True)
+        st.dataframe(df_mem[cols_to_show].head(30), width="stretch", hide_index=True)
 
 # ══════════════════════════════════════════════════════════════════════════
 # TAB 9, LIVE STREAM
@@ -2399,7 +2399,6 @@ def _tail(path, n=25):
         return ""
 
 
-@st.fragment(run_every=3)
 def _live_stream_fragment(live_results_path, disruption_flag_path):
     st.caption("Auto-refreshes every 3 seconds. Keep this tab open during your demo.")
 
@@ -2451,7 +2450,7 @@ def _live_stream_fragment(live_results_path, disruption_flag_path):
                 "routing_method", "routing_note", "alternate_route"
             ] if c in df_anomalies.columns]
             st.dataframe(df_anomalies[cols_to_show].reset_index(drop=True),
-                         use_container_width=True)
+                         width="stretch")
 
     st.markdown("#### All Transactions (last 50)")
     cols_to_show = [c for c in [
@@ -2459,7 +2458,7 @@ def _live_stream_fragment(live_results_path, disruption_flag_path):
         "retailer", "quantity", "z_score", "is_anomaly"
     ] if c in df_live.columns]
     st.dataframe(df_live[cols_to_show].tail(50).reset_index(drop=True),
-                 use_container_width=True)
+                 width="stretch")
 
     if "z_score" in df_live.columns and "row_index" in df_live.columns:
         st.markdown("#### Z-Score Signal Over Time")
@@ -2477,7 +2476,7 @@ def _live_stream_fragment(live_results_path, disruption_flag_path):
             template="report", height=300,
             margin=dict(l=40, r=20, t=20, b=40)
         )
-        st.plotly_chart(fig_stream, use_container_width=True)
+        st.plotly_chart(fig_stream, width="stretch")
     # Fragment reruns itself every 3s (run_every=3 above), no manual
     # sleep/rerun needed, and this no longer touches the rest of the app.
 
@@ -2524,11 +2523,11 @@ with tab_live:
         with cc5:
             st.markdown("<div style='height:1.7rem'></div>", unsafe_allow_html=True)
             if _running:
-                if st.button("Stop simulation", type="primary", use_container_width=True):
+                if st.button("Stop simulation", type="primary", width="stretch"):
                     _stop_stream()
                     st.rerun()
             else:
-                if st.button("▶ Start simulation", type="primary", use_container_width=True):
+                if st.button("▶ Start simulation", type="primary", width="stretch"):
                     _start_stream(_interval, _dis_at if _dis_at > 0 else None, _multi, _domain)
                     st.rerun()
         if _running:
@@ -2551,7 +2550,10 @@ with tab_live:
                 st.markdown("**consumer**")
                 st.code(_tail(STREAM_LOGS["consumer"]) or "(no output yet)", language=None)
 
-    _live_stream_fragment(LIVE_RESULTS_PATH, DISRUPTION_FLAG_PATH)
+    # Only poll every 3s while a stream is actually running; an idle (or hosted) app
+    # should not keep rerunning in the background.
+    st.fragment(_live_stream_fragment, run_every=3 if _stream_pids() else None)(
+        LIVE_RESULTS_PATH, DISRUPTION_FLAG_PATH)
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -2620,7 +2622,7 @@ with tab_live:
                         constituent = detail.get("constituent_events", [])
                         if constituent:
                             import pandas as _pd2
-                            st.dataframe(_pd2.DataFrame(constituent), use_container_width=True)
+                            st.dataframe(_pd2.DataFrame(constituent), width="stretch")
                 st.markdown("---")
 
             # ── Regular event metrics ──────────────────────────────────────
@@ -2712,7 +2714,7 @@ with tab_live:
                                     "Response Type":   m.get("response_type"),
                                     "Disruption Type": m.get("disruption_type"),
                                 })
-                            st.dataframe(pd.DataFrame(mem_rows), use_container_width=True)
+                            st.dataframe(pd.DataFrame(mem_rows), width="stretch")
                             if data.get("avg_recovery_days"):
                                 st.success(f"Estimated recovery: **{data['avg_recovery_days']} days** | "
                                            f"Recommended: **{data.get('recommended_response','?')}**")
@@ -2737,7 +2739,7 @@ with tab_live:
                                 )
                             if data.get("top_candidates"):
                                 st.markdown("**Top candidate distributors evaluated:**")
-                                st.dataframe(pd.DataFrame(data["top_candidates"]), use_container_width=True)
+                                st.dataframe(pd.DataFrame(data["top_candidates"]), width="stretch")
 
                         elif phase == "BACKUP SUPPLIER" and data.get("top_backups"):
                             st.markdown(f"**Affected retailers:** {data.get('affected_retailers','?')} | "
@@ -2753,7 +2755,7 @@ with tab_live:
                                     "Volume":         b.get("out_volume","?"),
                                     "Safety Score":   b.get("safety_score","?"),
                                 })
-                            st.dataframe(pd.DataFrame(sup_rows), use_container_width=True)
+                            st.dataframe(pd.DataFrame(sup_rows), width="stretch")
 
                         elif phase == "INVENTORY TRANSFER" and data.get("top_transfers"):
                             st.markdown(f"**Retailer state:** {data.get('retailer_state','?')} | "
@@ -2770,7 +2772,7 @@ with tab_live:
                                     "Fuel Cost":      t.get("fuel_cost","?"),
                                     "Est. Days":      t.get("estimated_days","?"),
                                 })
-                            st.dataframe(pd.DataFrame(inv_rows), use_container_width=True)
+                            st.dataframe(pd.DataFrame(inv_rows), width="stretch")
 
                         elif phase == "FINAL VERDICT":
                             st.markdown(f"Severity: **{data.get('severity','?')}** | "
@@ -2820,7 +2822,7 @@ with tab_live:
                     "Manufacturer":dec.get("manufacturer","?")[:25],
                     "Retailer":    dec.get("retailer","?")[:25],
                 })
-            st.dataframe(pd.DataFrame(summary_rows), use_container_width=True)
+            st.dataframe(pd.DataFrame(summary_rows), width="stretch")
 
         st.markdown("---")
         if st.button("Refresh decisions"):
@@ -2888,23 +2890,23 @@ with tab_live:
         b1, b2, b3, b4, b5 = st.columns([1, 1, 1, 1.4, 2])
         with b1:
             if st.session_state["rp_playing"]:
-                if st.button("Pause", use_container_width=True, key="rp_pause"):
+                if st.button("Pause", width="stretch", key="rp_pause"):
                     st.session_state["rp_playing"] = False
             else:
-                if st.button("▶ Play", type="primary", use_container_width=True, key="rp_play"):
+                if st.button("▶ Play", type="primary", width="stretch", key="rp_play"):
                     if st.session_state["rp_idx"] >= _n - 1:
                         st.session_state["rp_idx"] = _start_idx
                     st.session_state["rp_playing"] = True
         with b2:
-            if st.button("Step", use_container_width=True, key="rp_step"):
+            if st.button("Step", width="stretch", key="rp_step"):
                 st.session_state["rp_playing"] = False
                 st.session_state["rp_idx"] = min(st.session_state["rp_idx"] + 1, _n - 1)
         with b3:
-            if st.button("↺ Reset", use_container_width=True, key="rp_reset"):
+            if st.button("↺ Reset", width="stretch", key="rp_reset"):
                 st.session_state["rp_playing"] = False
                 st.session_state["rp_idx"] = _start_idx
         with b4:
-            if st.button("Jump to alert", use_container_width=True, key="rp_jump",
+            if st.button("Jump to alert", width="stretch", key="rp_jump",
                          disabled=_first_alert is None):
                 st.session_state["rp_playing"] = False
                 st.session_state["rp_idx"] = int(_first_alert)
@@ -2977,8 +2979,8 @@ with tab_live:
                                 yaxis_title="Surprise (−log10 p)",
                                 xaxis=dict(range=[_rows["date"].min(), _rows["date"].max()]))
             g1, g2 = st.columns([3, 2])
-            with g1: st.plotly_chart(fig_r, use_container_width=True)
-            with g2: st.plotly_chart(fig_s, use_container_width=True)
+            with g1: st.plotly_chart(fig_r, width="stretch")
+            with g2: st.plotly_chart(fig_s, width="stretch")
 
             # ── response ladder engages once the alert has fired ───────────
             if fired_so_far:
@@ -3000,7 +3002,7 @@ with tab_live:
                     "Tier": e["tier"].split("_")[0], "System's move": e["recommendation"],
                     "Buffer $": (f"${e['buffer']['buffer_usd']:,}" if e.get("buffer") else ""),
                 } for e in _ev["lanes"]]
-                st.dataframe(pd.DataFrame(_lr), use_container_width=True, hide_index=True,
+                st.dataframe(pd.DataFrame(_lr), width="stretch", hide_index=True,
                              height=min(320, 36 * len(_lr) + 40))
             elif in_doc:
                 st.warning("Inside the documented window, the detector has not crossed its "
