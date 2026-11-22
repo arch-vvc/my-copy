@@ -817,7 +817,7 @@ with tab_risk:
             st.markdown("#### GNN Embedding Space")
             fig_path = os.path.join(FIGS, "fig5_gnn_embeddings.png")
             if os.path.exists(fig_path):
-                st.image(fig_path, use_column_width=True)
+                st.image(fig_path, use_container_width=True)
 
         # ── GNN score: does it detect anything? (node-level injection benchmark) ──
         _gb = load_json("gnn_injection_eval.json")
@@ -944,7 +944,7 @@ with tab_risk:
         col_ppo1, col_ppo2 = st.columns([1.4, 1])
         with col_ppo1:
             if os.path.exists(ppo_fig):
-                st.image(ppo_fig, use_column_width=True,
+                st.image(ppo_fig, use_container_width=True,
                          caption="PPO agent cumulative reward over training episodes")
             else:
                 st.info("Run Stage 11 (PPO Routing Agent) to generate the training figure.")
@@ -2054,7 +2054,7 @@ with tab_recovery:
 
         fig_path = os.path.join(FIGS, "fig6_recovery.png")
         if os.path.exists(fig_path):
-            st.image(fig_path, use_column_width=True)
+            st.image(fig_path, use_container_width=True)
 
         # ── Inventory Agent ───────────────────────────────────────────
         st.divider()
@@ -2136,7 +2136,7 @@ with tab_multi:
             st.warning("multi_domain_f1.csv is missing required columns: Industry, F1_Score")
             st.dataframe(df_f1, use_container_width=True)
             if os.path.exists(fig_path):
-                st.image(fig_path, use_column_width=True)
+                st.image(fig_path, use_container_width=True)
         else:
             best_pool   = df_f1[df_f1["Industry"].astype(str).str.lower() != "all domains"]
             best_row    = best_pool.sort_values("F1_Score", ascending=False).iloc[0] if not best_pool.empty else None
@@ -2152,7 +2152,7 @@ with tab_multi:
             st.dataframe(df_f1, use_container_width=True)
 
             if os.path.exists(fig_path):
-                st.image(fig_path, use_column_width=True)
+                st.image(fig_path, use_container_width=True)
 
 # ══════════════════════════════════════════════════════════════════════════
 # TAB 8, IMMUNOLOGICAL MEMORY (FAISS)
